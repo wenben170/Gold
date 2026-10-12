@@ -1,0 +1,514 @@
+/* ==========================================================================
+   Live YouTube Monitor - dark monitoring dashboard
+   ========================================================================== */
+
+:root {
+    --bg: #070b14;
+    --bg-glow-1: rgba(34, 197, 94, 0.08);
+    --bg-glow-2: rgba(59, 130, 246, 0.10);
+    --surface: rgba(255, 255, 255, 0.045);
+    --surface-hover: rgba(255, 255, 255, 0.075);
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --text: #e6edf7;
+    --text-muted: #8c9ab0;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --idle: #94a3b8;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --gap: 16px;
+    --font: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --transition: 0.2s ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+html {
+    color-scheme: dark;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--text);
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(900px 500px at 10% -10%, var(--bg-glow-1), transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, var(--bg-glow-2), transparent 60%);
+    background-attachment: fixed;
+    line-height: 1.45;
+}
+
+/* ---------- Accessibility helpers ---------- */
+
+.skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 100;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--ok);
+    color: #04210f;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top var(--transition);
+}
+
+.skip-link:focus {
+    top: 12px;
+}
+
+:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 24px;
+    padding: 18px clamp(16px, 3vw, 32px);
+    border-bottom: 1px solid var(--border);
+    background: rgba(7, 11, 20, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+}
+
+.brand-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    animation: pulse 2s infinite;
+}
+
+.brand-subtitle {
+    margin: 4px 0 0 22px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+}
+
+.page-indicator {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Pager ---------- */
+
+.pager {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pager-pages {
+    display: flex;
+    gap: 6px;
+}
+
+/* ---------- Buttons (button and anchor variants) ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.btn:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn[aria-current="page"] {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.55);
+    color: #b7f7cd;
+}
+
+.btn-small {
+    padding: 6px 11px;
+    font-size: 0.78rem;
+}
+
+/* ---------- Video pages and grid ---------- */
+
+.video-pages {
+    padding: clamp(14px, 2.5vw, 28px) clamp(16px, 3vw, 32px) 8px;
+    max-width: 1700px;
+    margin: 0 auto;
+}
+
+.video-pages:focus {
+    outline: none;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap);
+    animation: page-in 0.3s ease;
+}
+
+/* ---------- Video card ---------- */
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+
+.card:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.card-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.card-number {
+    flex: none;
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.07);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-title {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* ---------- Status indicator ---------- */
+
+.status {
+    --status-color: var(--warn);
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border: 1px solid color-mix(in srgb, var(--status-color) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--status-color) 12%, transparent);
+    color: var(--status-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--status-color);
+}
+
+.card[data-status="loading"] .status,
+.card[data-status="unknown"] .status { --status-color: var(--warn); }
+
+.card[data-status="embedded"] .status,
+.card[data-status="playing"] .status { --status-color: var(--ok); }
+
+.card[data-status="paused"] .status,
+.card[data-status="ended"] .status { --status-color: var(--idle); }
+
+.card[data-status="unavailable"] .status { --status-color: var(--danger); }
+
+.card[data-status="playing"] .status-dot,
+.card[data-status="loading"] .status-dot {
+    animation: pulse-dot 1.6s infinite;
+}
+
+/* ---------- Player stage ---------- */
+
+.stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+}
+
+.player-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.stage:fullscreen {
+    aspect-ratio: auto;
+    border-radius: 0;
+}
+
+.stage:-webkit-full-screen {
+    aspect-ratio: auto;
+    border-radius: 0;
+}
+
+/* Loading spinner (sits above the iframe, never blocks clicks) */
+.card[data-status="loading"] .stage::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 3px solid rgba(255, 255, 255, 0.18);
+    border-top-color: var(--ok);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Small banner for hints such as the autoplay message */
+.notice {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    max-width: calc(100% - 24px);
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.78);
+    border: 1px solid var(--border-strong);
+    color: #fff;
+    font-size: 0.78rem;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Full overlay shown when YouTube refuses to play the video */
+.error-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    background: rgba(8, 12, 22, 0.95);
+    text-align: center;
+}
+
+.error-overlay h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #fecaca;
+}
+
+.error-overlay p {
+    margin: 0;
+    max-width: 38ch;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.error-overlay .error-detail {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.error-overlay .btn {
+    margin-top: 8px;
+}
+
+/* ---------- Card actions ---------- */
+
+.card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ---------- Footer ---------- */
+
+.app-footer {
+    padding: 14px clamp(16px, 3vw, 32px) 28px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.app-footer p {
+    margin: 4px 0;
+}
+
+kbd {
+    padding: 1px 7px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    font: inherit;
+    font-size: 0.72rem;
+}
+
+.noscript {
+    padding: 24px;
+    text-align: center;
+    color: var(--warn);
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+    70%  { box-shadow: 0 0 0 9px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes page-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Responsive ---------- */
+
+/* Tablet keeps the 2 x 2 grid but tightens the spacing */
+@media (max-width: 1024px) {
+    :root { --gap: 12px; }
+    .card { padding: 10px; gap: 10px; }
+}
+
+/* Mobile: 1 x 4 */
+@media (max-width: 768px) {
+    .video-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-header {
+        position: static;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pager {
+        justify-content: space-between;
+    }
+
+    .page-indicator {
+        align-self: flex-start;
+    }
+
+    .app-footer kbd:nth-of-type(n) {
+        display: inline-block;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

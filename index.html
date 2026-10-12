@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Local dashboard that monitors 8 YouTube videos across 2 pages.">
+    <title>Live YouTube Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#video-pages">Skip to videos</a>
+
+    <header class="app-header">
+        <div class="brand">
+            <h1 class="brand-title">
+                <span class="brand-dot" aria-hidden="true"></span>
+                LIVE YOUTUBE MONITOR
+            </h1>
+            <p class="brand-subtitle"><span id="source-count">8</span> VIDEO SOURCES</p>
+        </div>
+
+        <nav class="pager" aria-label="Page navigation">
+            <button id="prev-btn" class="btn" type="button" aria-label="Previous page">&#8249; Previous</button>
+            <div id="page-buttons" class="pager-pages" role="group" aria-label="Pages"></div>
+            <button id="next-btn" class="btn" type="button" aria-label="Next page">Next &#8250;</button>
+        </nav>
+
+        <div id="page-indicator" class="page-indicator" aria-live="polite">PAGE 1 / 2</div>
+    </header>
+
+    <main id="video-pages" class="video-pages" tabindex="-1">
+        <noscript>
+            <p class="noscript">This dashboard needs JavaScript enabled to display the videos.</p>
+        </noscript>
+    </main>
+
+    <footer class="app-footer">
+        <p>
+            Shortcuts: <kbd>&larr;</kbd> previous page &middot; <kbd>&rarr;</kbd> next page &middot;
+            <kbd>1</kbd> page 1 &middot; <kbd>2</kbd> page 2
+        </p>
+        <p>Status reflects what the embedded YouTube player reports. A loaded player does not guarantee a video is live.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
