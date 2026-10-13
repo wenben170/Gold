@@ -17,14 +17,14 @@
 
     /** All video slots, in display order. */
     const videos = [
-        { id: '7ivFgFHOwT0', title: 'YouTube Monitor 01' },
-        { id: '3H4IVQejlDE', title: 'YouTube Monitor 02' },
-        { id: '-ps7V40GrA4', title: 'YouTube Monitor 03' },
-        { id: '6OGkxoouYD4', title: 'YouTube Monitor 04' },
-        { id: '7ivFgFHOwT0', title: 'YouTube Monitor 05' },
-        { id: '3H4IVQejlDE', title: 'YouTube Monitor 06' },
-        { id: '-ps7V40GrA4', title: 'YouTube Monitor 07' },
-        { id: '6OGkxoouYD4', title: 'YouTube Monitor 08' }
+    { id: '3H4IVQejlDE', title: 'YouTube Monitor 01' },
+    { id: '-ps7V40GrA4', title: 'YouTube Monitor 02' },
+    { id: '6OGkxoouYD4', title: 'YouTube Monitor 03' },
+    { id: 'QjPymAueOY8', title: 'YouTube Monitor 04' },
+    { id: 'Cf9klXhb0G8', title: 'YouTube Monitor 05' },
+    { id: 'C3eAZB9tHC8', title: 'YouTube Monitor 06' },
+    { id: 'T5QkPj4dEZk', title: 'YouTube Monitor 07' },
+    { id: 'eb2W1kfRbXE', title: 'YouTube Monitor 08' }
     ];
 
     const VIDEOS_PER_PAGE = 4;
